@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -66,5 +67,27 @@ public class PromoCodeController {
         }
         this.promoCodeDao.deleteCodeFromDatabase(id);
         return new ApiResponse(HttpStatus.ACCEPTED, "You deleted some data!");
+    }
+
+    @RequestMapping(value = "/toggle-status/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ApiResponse togglePromoCodeStatus(@PathVariable UUID id, @RequestBody Map<String, Boolean> statusRequest) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userDao.findByEmail(email).orElse(null);
+
+        if (user == null || !this.userDao.isUserAdmin(user)) {
+            return new ApiResponse(HttpStatus.UNAUTHORIZED, "Only Admins Are Allowed to toggle promocode status");
+        }
+
+        boolean newStatus = statusRequest.get("active");
+        PromoCode promoCode = this.promoCodeDao.getPromoById(id);
+
+        if (promoCode != null) {
+            promoCode.setActive(newStatus);
+            this.promoCodeDao.saveToDatabase(promoCode);
+            return new ApiResponse(HttpStatus.ACCEPTED, "Promocode status toggled successfully");
+        } else {
+            return new ApiResponse(HttpStatus.NOT_FOUND, "Promocode not found");
+        }
     }
 }

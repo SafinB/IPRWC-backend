@@ -56,8 +56,13 @@ public class ProductController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @ResponseBody
     public ApiResponse updateProduct(@RequestBody Product product) {
+        String email = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userDao.findByEmail(email).get();
+        if (!this.userDao.isUserAdmin(user)){
+            return new ApiResponse(HttpStatus.UNAUTHORIZED, "Only Admins Are Allowed to add new products");
+        }
         this.productDao.updateProduct(product);
-        return new ApiResponse(HttpStatus.ACCEPTED, "You updated some data!");
+        return new ApiResponse(HttpStatus.ACCEPTED, "You posted some data!");
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
