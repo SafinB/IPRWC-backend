@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/product/insert{id}").hasRole("USER")
                 .requestMatchers(HttpMethod.PUT, "/product/update").hasRole("USER")
                 .requestMatchers(HttpMethod.DELETE, "/product/delete/{id}").hasRole("USER")
+                .requestMatchers(HttpMethod.GET, "/order/insert").permitAll()
                 .requestMatchers(HttpMethod.GET, "/promocode/get").permitAll()
                 .requestMatchers(HttpMethod.GET, "/promocode/get/{id}").hasRole("USER")
                 .requestMatchers(HttpMethod.POST, "/promocode/insert").hasRole("USER")
