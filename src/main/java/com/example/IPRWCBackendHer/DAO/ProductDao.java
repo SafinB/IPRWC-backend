@@ -5,7 +5,6 @@ import com.example.IPRWCBackendHer.repository.ProductRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -37,9 +36,5 @@ public class ProductDao {
 
     public Product getProductById(UUID id) {
         return this.productRepository.findById(id).get();
-    }
-
-    public Optional<Product> findById(UUID productId) {
-        return productRepository.findById(productId);
     }
 }

@@ -2,7 +2,7 @@ package com.example.IPRWCBackendHer.DAO;
 
 import com.example.IPRWCBackendHer.models.User;
 import com.example.IPRWCBackendHer.repository.UserRepository;
-import com.example.IPRWCBackendHer.services.CheckIfUserIsAdminService;
+import com.example.IPRWCBackendHer.services.CheckAdminService;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
 
@@ -12,11 +12,11 @@ import java.util.Optional;
 @Component
 public class UserDao {
     private final UserRepository userRepository;
-    private final CheckIfUserIsAdminService checkIfUserIsAdminService;
+    private final CheckAdminService checkAdminService;
 
-    public UserDao(UserRepository userRepository, CheckIfUserIsAdminService checkIfUserIsAdminService) {
+    public UserDao(UserRepository userRepository, CheckAdminService checkAdminService) {
         this.userRepository = userRepository;
-        this.checkIfUserIsAdminService = checkIfUserIsAdminService;
+        this.checkAdminService = checkAdminService;
     }
 
     public void saveToDatabase(User user) {
@@ -43,7 +43,6 @@ public class UserDao {
     }
 
     public boolean isUserAdmin(User user){
-        return checkIfUserIsAdminService.IsUserAdmin(userRepository.findById(user.getId()));
+        return checkAdminService.IsUserAdmin(userRepository.findById(user.getId()));
     }
-
 }

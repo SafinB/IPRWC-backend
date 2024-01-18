@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class CheckIfUserIsAdminService {
+public class CheckAdminService {
     public boolean IsUserAdmin(Optional<User> user) {
         return user.map(User::isRole).orElse(false);
     }

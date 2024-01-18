@@ -6,8 +6,6 @@ import com.example.IPRWCBackendHer.models.LoginCredentials;
 import com.example.IPRWCBackendHer.models.User;
 import com.example.IPRWCBackendHer.security.JWTUtil;
 import com.example.IPRWCBackendHer.services.InvalidMailService;
-import com.example.IPRWCBackendHer.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,16 +22,10 @@ import java.util.UUID;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private JWTUtil jwtUtil;
-    @Autowired
-    private AuthenticationManager authManager;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserService userService;
+    private final UserDao userDao;
+    private final JWTUtil jwtUtil;
+    private final AuthenticationManager authManager;
+    private final PasswordEncoder passwordEncoder;
 
     private final InvalidMailService invalidMailService;
 
@@ -52,12 +45,12 @@ public class AuthController {
                 String encodedPass = passwordEncoder.encode(user.getPassword());
                 user.setPassword(encodedPass);
                 userDao.saveToDatabase(user);
-                return new ApiResponse(HttpStatus.ACCEPTED, jwtUtil.generateToken(user.getEmail()));
+                return new ApiResponse<>(HttpStatus.ACCEPTED, jwtUtil.generateToken(user.getEmail()));
             } else {
-                return new ApiResponse(HttpStatus.BAD_REQUEST, "Invalid email");
+                return new ApiResponse<>(HttpStatus.BAD_REQUEST, "Invalid email");
             }
         } catch (Exception e) {
-            return new ApiResponse(HttpStatus.BAD_REQUEST, "Email already in use");
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST, "Email already in use");
         }
     }
 
@@ -65,37 +58,33 @@ public class AuthController {
     public Object loginHandler(@RequestBody LoginCredentials body) {
         try {
             String email = body.getEmail();
-
             if (invalidMailService.patternMatches(email)) {
                 UsernamePasswordAuthenticationToken authInputToken =
                         new UsernamePasswordAuthenticationToken(body.getEmail(), body.getPassword());
                 authManager.authenticate(authInputToken);
-
-                Optional<User> user = Optional.ofNullable(userService.findUserByEmail(email));
-
-                return new ApiResponse(HttpStatus.ACCEPTED, jwtUtil.generateToken(body.getEmail()));
+                return new ApiResponse<>(HttpStatus.ACCEPTED, jwtUtil.generateToken(body.getEmail()));
             } else {
-                return new ApiResponse(HttpStatus.BAD_REQUEST, "Invalid email");
+                return new ApiResponse<>(HttpStatus.BAD_REQUEST, "Invalid email");
             }
         } catch (AuthenticationException authExc) {
-            return new ApiResponse(HttpStatus.UNAUTHORIZED, "Invalid email/password");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Invalid email/password");
         }
     }
 
     @GetMapping("/info")
-    public ApiResponse getUserDetails() {
+    public ApiResponse<User> getUserDetails() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return new ApiResponse(HttpStatus.ACCEPTED, userDao.findByEmail(email).get());
+        return new ApiResponse<>(HttpStatus.ACCEPTED, userDao.findByEmail(email).get());
     }
 
     @GetMapping("/get")
-    public ApiResponse getAllUsers() {
-       return new ApiResponse(HttpStatus.ACCEPTED, userDao.getAllUsers());
+    public ApiResponse<ArrayList<User>> getAllUsers() {
+       return new ApiResponse<>(HttpStatus.ACCEPTED, userDao.getAllUsers());
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ApiResponse deleteUser(@PathVariable UUID id) {
+    public ApiResponse<User> deleteUser(@PathVariable UUID id) {
         String email = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> optionalUser = userDao.findByEmail(email);
 
@@ -105,11 +94,11 @@ public class AuthController {
             if (this.userDao.isUserAdmin(user)) {
                 userDao.deleteUserFromDatabase(id);
             } else {
-                return new ApiResponse(HttpStatus.UNAUTHORIZED, "Only Admins Are Allowed to delete products");
+                return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Only Admins Are Allowed to delete products");
             }
         } else {
-            return new ApiResponse(HttpStatus.BAD_REQUEST, "User not found");
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST, "User not found");
         }
-        return new ApiResponse(HttpStatus.ACCEPTED, "You deleted some data!");
+        return new ApiResponse<>(HttpStatus.ACCEPTED, "You deleted some data!");
     }
 }

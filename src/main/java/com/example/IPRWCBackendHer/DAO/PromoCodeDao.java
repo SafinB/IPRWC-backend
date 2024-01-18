@@ -1,6 +1,5 @@
 package com.example.IPRWCBackendHer.DAO;
 
-import com.example.IPRWCBackendHer.models.Product;
 import com.example.IPRWCBackendHer.models.PromoCode;
 import com.example.IPRWCBackendHer.repository.PromoCodeRepository;
 import org.springframework.stereotype.Component;

@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .cors()
                 .and()
-                .authorizeRequests()
+                .authorizeHttpRequests()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/auth/info").hasRole("USER")
                 .requestMatchers(HttpMethod.DELETE, "/auth/delete/{id}").hasRole("USER")
@@ -77,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://iprwc-frontend-sfb.web.app"));
+        configuration.setAllowedOrigins(Arrays.asList("https://iprwc-frontend-sfb.web.app/"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
          configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
