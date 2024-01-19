@@ -11,10 +11,8 @@ import java.util.UUID;
 public class ProductDao {
     private final ProductRepository productRepository;
 
-
     public ProductDao(ProductRepository productRepository) {
         this.productRepository = productRepository;
-
     }
 
     public void saveToDatabase(Product product) {
@@ -24,7 +22,6 @@ public class ProductDao {
     public void updateProduct(Product product) {
         productRepository.updateProduct(product.getName(), product.getDescription(), product.getPrice(), product.getId());
     }
-
 
     public void deleteProductById(UUID id) {
         this.productRepository.deleteById(id);

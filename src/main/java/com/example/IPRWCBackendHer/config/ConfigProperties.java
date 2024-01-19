@@ -1,6 +1,5 @@
 package com.example.IPRWCBackendHer.config;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -24,10 +23,4 @@ public class ConfigProperties {
     @NotBlank
     @Size(min = 20)
     private String jwtSecret;
-    @NotBlank
-    @Email
-    private String rootEmail;
-    @NotBlank
-    @Size(min = 8)
-    private String rootPassword;
 }
